@@ -94,20 +94,20 @@ public class BlinkStickFinder {
 	 * Open BlinkStick device. The function checks for permission to open BlinkStick device.
 	 * If permission hasn't been granted, it requests the permission from UsbManager class.
 	 * 
-	 * @param led	BlinkStick device to open
+	 * @param blinkStick	BlinkStick device to open
 	 * 
 	 * @return true if device was opened successfully
 	 */
-	public Boolean openDevice(BlinkStick led)
+	public Boolean openDevice(BlinkStick blinkStick)
 	{
-        if (usbManager.hasPermission(led.getDevice()))
+        if (usbManager.hasPermission(blinkStick.getDevice()))
         {
-            led.setConnection(usbManager.openDevice(led.getDevice()));
+            blinkStick.setConnection(usbManager.openDevice(blinkStick.getDevice()));
             return true;
         }
         else
         {
-            usbManager.requestPermission(led.getDevice(), permissionIntent);
+            usbManager.requestPermission(blinkStick.getDevice(), permissionIntent);
             return false;
         }
 	}

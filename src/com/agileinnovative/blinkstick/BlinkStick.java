@@ -16,10 +16,19 @@ public class BlinkStick {
 	 */
 	private UsbDevice device = null;
 
-	
+	/** 
+	 * USB connection for communicating with BlinkStick
+	 */
     private UsbDeviceConnection connection;
     
+	/** 
+	 * Cached manufacturer name
+	 */
     private String manufacturer = null;
+
+	/** 
+	 * Cached product name
+	 */
     private String productName = null;
     
 	/** 
@@ -31,14 +40,34 @@ public class BlinkStick {
 		this.device = device;
 	}
 	
+	/** 
+	 * Get UsbDevice
+	 * 
+	 * @return		USB device reference
+	 */
 	public UsbDevice getDevice()
 	{
 		return this.device;
 	}
 
+	/** 
+	 * Assign USB device connection
+	 * 
+	 * @param con Connection object to communicate with BlinkStick device
+	 */
 	public void setConnection(UsbDeviceConnection con)
 	{
 		connection = con;
+	}
+	
+	/**
+	 * Check if BlinkStick is connected
+	 * 
+	 * @return Returns true if BlinkStick is connected
+	 */
+	public boolean isConnected()
+	{
+		return connection != null;
 	}
 
 	/** 
@@ -68,6 +97,12 @@ public class BlinkStick {
         }
 	}
 	
+
+	/**
+	 * Sends feature report to BlinkStick
+	 * 
+	 * @param buffer An array of bytes to send to the device. First byte has to be report id.
+	 */
 	private void sendFeatureReport(byte[] buffer)
 	{
         if (connection != null)
@@ -76,6 +111,13 @@ public class BlinkStick {
         }
 	}
 	
+	/**
+	 * Get feature report from BlinkStick
+	 * 
+	 * @param buffer An array of bytes to receive from the device. First byte has to be report id. The array must be initialized with correct size.
+	 * 
+	 * @return		Number of bytes read from the device
+	 */
 	private int getFeatureReport(byte[] buffer)
 	{
         if (connection != null)
@@ -184,7 +226,7 @@ public class BlinkStick {
 	}
 
 	/** 
-	 * Turn the device off
+	 * Turn BlinkStick off
 	 */
 	public void turnOff() {
 		this.setColor(0, 0, 0);
@@ -568,7 +610,9 @@ public class BlinkStick {
 	} 
 	
 	
-	
+	/**
+	 * Variable holds the list of valid CSS colors as a hashtable
+	 */
 	private static final Hashtable<String, String> COLORS = new Hashtable<String, String>() {
 		/**
 		 * 
