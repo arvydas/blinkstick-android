@@ -8,6 +8,7 @@ import java.util.List;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 
 public class BlinkStickFinder {
@@ -92,23 +93,41 @@ public class BlinkStickFinder {
 	
 	/** 
 	 * Open BlinkStick device. The function checks for permission to open BlinkStick device.
-	 * If permission hasn't been granted, it requests the permission from UsbManager class.
 	 * 
 	 * @param blinkStick	BlinkStick device to open
 	 * 
 	 * @return true if device was opened successfully
+	 * @throws BlinkStickUnauthorizedException
 	 */
-	public Boolean openDevice(BlinkStick blinkStick)
+	public Boolean openDevice(BlinkStick blinkStick) throws BlinkStickUnauthorizedException
 	{
         if (usbManager.hasPermission(blinkStick.getDevice()))
         {
-            blinkStick.setConnection(usbManager.openDevice(blinkStick.getDevice()));
-            return true;
+        	UsbDeviceConnection connection = usbManager.openDevice(blinkStick.getDevice());
+        	if (connection != null)
+        	{
+                blinkStick.setConnection(connection);
+                return true;
+        	}
+        	else
+        	{
+                return false;
+        	}
         }
         else
         {
-            usbManager.requestPermission(blinkStick.getDevice(), permissionIntent);
-            return false;
+        	throw new BlinkStickUnauthorizedException();
         }
+	}
+	
+	/** 
+	 * Request permission from user to use BlinkStick device.
+	 * 
+	 * @param blinkStick	BlinkStick device to open
+	 * 
+	 */
+	public void requestPermission(BlinkStick blinkStick)
+	{
+        usbManager.requestPermission(blinkStick.getDevice(), permissionIntent);
 	}
 }
