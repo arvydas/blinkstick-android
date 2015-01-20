@@ -11,6 +11,9 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 
+/**
+ * Main class to find connected BlinkStick devices. Requires context and permission intent.
+ */
 public class BlinkStickFinder {
 	/**
 	 * BlinkStick vendor ID 
@@ -31,7 +34,7 @@ public class BlinkStickFinder {
 	/** 
 	 * Set context which will be used to request access to UsbManager class.
 	 * 
-	 * @param intent	permission intent object
+	 * @param c	permission intent object
 	 */
     public void setContext(Context c)
     {

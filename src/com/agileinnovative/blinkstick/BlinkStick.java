@@ -6,6 +6,9 @@ import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 
+/**
+ * Class designed to communicate with BlinkStick devices.
+ */
 public class BlinkStick {
 
 	protected static final int STD_USB_REQUEST_GET_DESCRIPTOR = 0x06;
