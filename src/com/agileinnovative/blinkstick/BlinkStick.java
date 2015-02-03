@@ -287,7 +287,14 @@ public class BlinkStick {
 	 * Turn BlinkStick off
 	 */
 	public void turnOff() {
-		this.setColor(0, 0, 0);
+		if (this.getBlinkStickDevice() == BlinkStickDeviceEnum.BlinkStickStripOrSquare)
+		{
+			this.setColors(0, new byte[24]);
+		}
+		else
+		{
+			this.setColor(0, 0, 0);
+		}
 	}
 
 
