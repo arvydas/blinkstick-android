@@ -62,6 +62,37 @@ public class BlinkStick {
 	{
 		connection = con;
 	}
+	
+	private int _VersionMajor = -1;
+
+	/**
+	 * Get major version number from serial
+	 * 
+	 * @return Major version number as int
+	 */
+	public int getVersionMajor() 
+	{
+		if (_VersionMajor == -1)
+		{
+            _VersionMajor = Integer.parseInt(getSerial().substring(getSerial().length() - 3, getSerial().length() - 2));
+		}
+		return _VersionMajor;
+	}
+
+	private int _VersionMinor = -1;
+
+	/**
+	 * Get minor version number from serial
+	 * 
+	 * @return Minor version number as int
+	 */
+	public int getVersionMinor() {
+		if (_VersionMinor == -1)
+		{
+            _VersionMinor = Integer.parseInt(getSerial().substring(getSerial().length() - 1, getSerial().length()));
+		}
+		return _VersionMinor;
+	}
 
 	/**
 	 * Check if BlinkStick is connected
