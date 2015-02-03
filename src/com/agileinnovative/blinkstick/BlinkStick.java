@@ -117,6 +117,37 @@ public class BlinkStick {
 		return BlinkStickDeviceEnum.Unknown;
 	}
 
+	private int brightnessLimit = 255;
+	
+	/**
+	 * Set the brightness limit
+	 * 
+	 * @param value the maximum amount of brightness for LEDs in the range of [0..255]
+	 */
+	public void setBrightnessLimit(int value)
+	{
+		if (value < 0)
+		{
+			value = 0;
+		}
+		else if (value > 255)
+		{
+			value = 255;
+		}
+		
+		brightnessLimit = value;
+	}
+	
+	
+	/**
+	 * Get the current brightness limit
+	 * 
+	 * @return the maximum amount of brightness for LEDs in the range of [0..255]
+	 */
+	public int getBrightnessLimit() 
+	{
+		return brightnessLimit;
+	}
 
 	/**
 	 * Check if BlinkStick is connected
@@ -148,6 +179,13 @@ public class BlinkStick {
 	 * @param b blue byte color value 0..255
 	 */
 	public void setColor(byte r, byte g, byte b) {
+		if (brightnessLimit < 255)
+		{
+			r = remapColor(r, brightnessLimit);
+			g = remapColor(g, brightnessLimit);
+			b = remapColor(b, brightnessLimit);
+		}
+		
 		try {
 			sendFeatureReport(new byte[] {1, r, g, b});
 		} catch (Exception e) {
@@ -209,6 +247,13 @@ public class BlinkStick {
 	 * @param b blue byte color value 0..255
 	 */
 	public void setIndexedColor(byte channel, byte index, byte r, byte g, byte b) {
+		if (brightnessLimit < 255)
+		{
+			r = remapColor(r, brightnessLimit);
+			g = remapColor(g, brightnessLimit);
+			b = remapColor(b, brightnessLimit);
+		}
+
 		try {
 			sendFeatureReport(new byte[] {5, channel, index, r, g, b});
 		} catch (Exception e) {
@@ -614,7 +659,14 @@ public class BlinkStick {
 
 		for (int i = 0; i < Math.min(colorData.length, data.length - 2); i++)
 		{
-			data[i + 2] = colorData[i];
+            if (brightnessLimit < 255)
+            {
+                data[i + 2] = remapColor(colorData[i], brightnessLimit);
+            }
+            else
+            {
+                data[i + 2] = colorData[i];
+            }
 		}
 
 		for (int i = colorData.length + 2; i < data.length; i++)
@@ -674,7 +726,44 @@ public class BlinkStick {
 		return -1;
 	} 
 
+	private byte remap(byte value, float leftMin, float leftMax, float rightMin, float rightMax)
+	{
+		//Figure out how 'wide' each range is
+		float leftSpan = leftMax - leftMin;
+		float rightSpan = rightMax - rightMin;
 
+		//Java does not have unsigned bytes, so we have to do some byte to int conversion
+		int valueInt = value;
+		if (valueInt < 0)
+		{
+			valueInt = valueInt + 0xff;
+		}
+		
+		//Convert the left range into a 0-1 range (float)
+		float valueScaled = (valueInt - leftMin) / leftSpan;
+		
+		//Convert the 0-1 range into a value in the right range.
+		valueInt = (int)(rightMin + (valueScaled * rightSpan));
+		
+		//Convert back to correct signed value before conversion to byte
+		if (valueInt > 127)
+		{
+			valueInt = valueInt - 0xff;
+		}
+		
+		return (byte)valueInt;
+	}
+	
+	private byte remapColor(byte value, float max_value)
+	{
+		return remap(value, 0, 255, 0, max_value);
+	}
+	
+	private int remapColorReverse(byte value, byte max_value)
+	{
+		return remap(value, 0, max_value, 0, 255);
+	}
+	
 	/**
 	 * Variable holds the list of valid CSS colors as a hashtable
 	 */
