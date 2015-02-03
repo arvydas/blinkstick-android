@@ -1,5 +1,7 @@
 var classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick =
 [
+    [ "getBlinkStickDevice", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#a1f98f861f8807568d16d31c5ec41b607", null ],
+    [ "getBrightnessLimit", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#abc8448d68bdec0c04af3676241244876", null ],
     [ "getColor", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#a1afbf9e954acd41b090e8a9a31273f03", null ],
     [ "getColorString", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#ad1f1cf46e96998912f400f330bd1110a", null ],
     [ "getDevice", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#afeb9633d88875d4bf269b2402c7f5e7f", null ],
@@ -9,7 +11,10 @@ var classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick =
     [ "getMode", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#a63282a1a496727d3844a0158e68f0ef6", null ],
     [ "getProduct", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#af578f71ee20d1c2da3ce6d1ddc986615", null ],
     [ "getSerial", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#a3cfe49df1d19f63d5b25baf09a5a66d3", null ],
+    [ "getVersionMajor", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#ae3c4ee27323d8a54c047bb6313f0b9bd", null ],
+    [ "getVersionMinor", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#a58e93ce6d844a9517cfc33fd48e27039", null ],
     [ "isConnected", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#ac94f1d2ae12d93e45dfb2bab9c871db0", null ],
+    [ "setBrightnessLimit", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#a1febbbefffd0c6188ff61fc4170c4cb2", null ],
     [ "setColor", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#ad63d033caf28047fdf4f67e94f149c22", null ],
     [ "setColor", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#a9d970bbc906433c11356f9e0aaba5452", null ],
     [ "setColor", "classcom_1_1agileinnovative_1_1blinkstick_1_1_blink_stick.html#acc81fd25c5330606a1fde2d0fd757839", null ],
