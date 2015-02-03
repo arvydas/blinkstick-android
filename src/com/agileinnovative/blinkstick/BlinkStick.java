@@ -94,6 +94,30 @@ public class BlinkStick {
 		return _VersionMinor;
 	}
 
+	
+	/**
+	 * Get BlinkStick device type
+	 * 
+	 * @return BlinkStick device type
+	 */
+	public BlinkStickDeviceEnum getBlinkStickDevice()
+	{
+		if (getVersionMajor() == 1)
+		{
+			return BlinkStickDeviceEnum.BlinkStick;
+		}
+		else if (getVersionMajor() == 2)
+		{
+			return BlinkStickDeviceEnum.BlinkStickPro;
+		}
+		else if (getVersionMajor() == 3)
+		{
+			return BlinkStickDeviceEnum.BlinkStickStripOrSquare;
+		}
+		return BlinkStickDeviceEnum.Unknown;
+	}
+
+
 	/**
 	 * Check if BlinkStick is connected
 	 * 
