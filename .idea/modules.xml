@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/BlinkStickAndroid/BlinkStickAndroid.iml" filepath="$PROJECT_DIR$/BlinkStickAndroid/BlinkStickAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BlinkStickTest/BlinkStickTest.iml" filepath="$PROJECT_DIR$/BlinkStickTest/BlinkStickTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BlinkStickTest-studio.iml" filepath="$PROJECT_DIR$/BlinkStickTest-studio.iml" />
+    </modules>
+  </component>
+</project>
