@@ -18,6 +18,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 public class MainActivity extends Activity {
 
 	public final static String TAG = "USBController";  
@@ -31,6 +33,7 @@ public class MainActivity extends Activity {
     Button buttonFrame;
     Button buttonOff;
     TextView textViewStatus;
+    Boolean permissionAcquired = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +51,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				findAndRequestPermission(true);
+				findBlinkStick();
 				updateUI();
 			}
 		});
@@ -106,14 +109,25 @@ public class MainActivity extends Activity {
 					boolean fromUser) {
 				
 				int index = barIndex.getProgress();
-				
+
+
 				if (index == 0)
 				{
-                    led.setColor(barR.getProgress(), barG.getProgress(), barB.getProgress());
+					byte[] data = new byte[3 * 8];
+					for (int i = 0; i < 8; i++) {
+						data[i*3] = (byte)barG.getProgress();
+						data[i*3 + 1] = (byte)barR.getProgress();
+						data[i*3 + 2] = (byte)barB.getProgress();
+					}
+					led.setColors(data);
+				}
+				else if (index == 1)
+				{
+					led.setColor(barR.getProgress(), barG.getProgress(), barB.getProgress());
 				}
 				else
 				{
-                    led.setIndexedColor((byte)0, (byte)index, barR.getProgress(), barG.getProgress(), barB.getProgress());
+                    led.setIndexedColor((byte)0, (byte)(index - 1), barR.getProgress(), barG.getProgress(), barB.getProgress());
 				}
 			}
 		};
@@ -143,7 +157,39 @@ public class MainActivity extends Activity {
 			}
 		});
 
+		barIndex.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+										  boolean fromUser) {
+				updateLedIndexText(progress);
+			}
+		});
+
+
+		updateLedIndexText(0);
 		updateUI();
+	}
+
+	private void updateLedIndexText(int index) {
+		TextView ledIndexView = (TextView)findViewById(R.id.textViewLedIndex);
+		if (index == 0) {
+		    ledIndexView.setText("Led Index (all LEDs)");
+		} else {
+			ledIndexView.setText("Led Index ("+ String.valueOf(index - 1) + ")");
+		}
 	}
 
 	private void updateUI() {
@@ -151,15 +197,15 @@ public class MainActivity extends Activity {
 		for (int i = 0; i < layout.getChildCount(); i++) {
 			View child = layout.getChildAt(i);
 			if (child.getId() != R.id.textViewStatus) {
-				child.setEnabled(led != null);
+				child.setEnabled(led != null && permissionAcquired);
 			}
 		}
 
-		buttonOff.setEnabled(led != null);
-		buttonFrame.setEnabled(led != null);
+		buttonOff.setEnabled(led != null && permissionAcquired);
+		buttonFrame.setEnabled(led != null && permissionAcquired);
 	}
 
-	private void findAndRequestPermission(Boolean requestPermission)
+	private void findBlinkStick()
 	{
 		if (led != null) {
 			Toast.makeText(this, "Already connected to BlinkStick...", Toast.LENGTH_SHORT).show();
@@ -167,6 +213,7 @@ public class MainActivity extends Activity {
 		}
 
 		led = finder.findFirst();
+
 		if (led == null)
 		{
 			textViewStatus.setText("Status: Could not find BlinkStick...");
@@ -176,65 +223,45 @@ public class MainActivity extends Activity {
 			l("Found BlinkStick device");
 
 			try {
-				if (finder.openDevice(led))
+				if (openBlinkStick(led))
 				{
-					l("Manufacturer: " + led.getManufacturer());
-					l("Product: " + led.getProduct());
-					l("Serial: " + led.getSerial());
-					l("Color: " + led.getColorString());
-					l("Mode: " + led.getMode());
+					permissionAcquired = true;
+					textViewStatus.setText("Status: Connected to " + led.getSerial());
 				}
-
-				textViewStatus.setText("Status: Connected to " + led.getSerial());
 			}
 			catch (BlinkStickUnauthorizedException e) {
-				if (requestPermission) {
-					finder.requestPermission(led);
-					findAndRequestPermission(false);
-				} else {
-					textViewStatus.setText("Status: Failed to get permission");
+                finder.requestPermission(led);
+
+				try {
+					if (!openBlinkStick(led)) {
+						textViewStatus.setText("Status: Failed to get permission");
+						led = null;
+					}
+				} catch (BlinkStickUnauthorizedException e1) {
+					e1.printStackTrace();
 				}
 			}
 		}
 	}
-	
-	/*
-	private void findDevice()
-	{
-        UsbManager mUsbManager = (UsbManager)getSystemService(Context.USB_SERVICE);  
-        HashMap<String, UsbDevice> devlist = mUsbManager.getDeviceList();
-        Iterator<UsbDevice> deviter = devlist.values().iterator(); 
-        
-        while (deviter.hasNext())   
-        {  
-            UsbDevice d = deviter.next();  
-            if (d.getVendorId() == 0x20A0 && d.getProductId() == 0x41e5)
-            {
-                l("Found BlinkStick device: "+ String.format("%04X:%04X", d.getVendorId(),d.getProductId()));  
-                
-                if (mUsbManager.hasPermission(d))
-                {
-                    connection = mUsbManager.openDevice(d);
-                }
-                else
-                {
-                	mUsbManager.requestPermission(d, mPermissionIntent);
-                }
-            }
-        }  
+
+	private Boolean openBlinkStick(BlinkStick device) throws BlinkStickUnauthorizedException {
+	    try {
+			if (finder.openDevice(device)) {
+				l("Manufacturer: " + led.getManufacturer());
+				l("Product: " + led.getProduct());
+				l("Serial: " + led.getSerial());
+				l("Color: " + led.getColorString());
+				l("Mode: " + led.getMode());
+				return true;
+			}
+		} catch (BlinkStickUnauthorizedException e) {
+	    	throw e;
+		}
+
+		return false;
 	}
-	
-	private void SetColor(int r, int g, int b)
-	{
-        if (connection != null)
-        {
-            byte[] buffer = new byte[] {0, (byte)r, (byte)g, (byte)b};
-            connection.controlTransfer(0x20, 0x9, 1, 0, buffer, buffer.length, 2000);
-        }
-	}
-	*/
-	
-	private void l(Object msg) {  
+
+	private void l(Object msg) {
         Log.d(TAG, ">==< " + msg.toString() + " >==<");  
     }  
 
