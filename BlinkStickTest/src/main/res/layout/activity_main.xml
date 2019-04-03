@@ -1,82 +1,107 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLinearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:text="Connect" />
-
-    <SeekBar
-        android:id="@+id/seekBar1"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/button1"
-        android:layout_marginTop="52dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonConnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connect" />
+
+        <Button
+            android:id="@+id/buttonOff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Turn Off" />
+
+        <Button
+            android:id="@+id/buttonFrame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send Frame" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewRed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Red"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <SeekBar
+        android:id="@+id/seekBarColorR"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:max="255" />
 
-    <SeekBar
-        android:id="@+id/seekBar2"
+    <TextView
+        android:id="@+id/textViewGreen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/seekBar1"
-        android:layout_marginTop="17dp"
+        android:text="Green"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <SeekBar
+        android:id="@+id/seekBarColorG"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:max="255" />
 
-    <SeekBar
-        android:id="@+id/seekBar3"
+    <TextView
+        android:id="@+id/textViewBlue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/seekBar2"
-        android:layout_below="@+id/seekBar2"
-        android:layout_marginTop="18dp"
+        android:text="Blue"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <SeekBar
+        android:id="@+id/seekBarColorB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:max="255" />
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button2"
-        android:layout_alignBottom="@+id/button2"
-        android:layout_centerHorizontal="true"
-        android:text="Off" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/seekBar4"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="16dp"
-        android:text="Frame" />
-
-    <SeekBar
-        android:id="@+id/seekBar4"
+    <TextView
+        android:id="@+id/textViewBrightness"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button3"
-        android:layout_alignLeft="@+id/seekBar3"
-        android:layout_marginBottom="20dp"
+        android:text="Brightness Limit"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <SeekBar
+        android:id="@+id/seekBarLedBrightness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:max="255"
         android:progress="255" />
 
-    <SeekBar
-        android:id="@+id/seekBar5"
+    <TextView
+        android:id="@+id/textViewLedIndex"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/seekBar4"
-        android:layout_alignLeft="@+id/seekBar4"
-        android:layout_marginBottom="16dp"
-        android:max="7" />
+        android:text="Led Index"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
 
-</RelativeLayout>
+    <SeekBar
+        android:id="@+id/seekBarLedIndex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="8" />
+
+    <TextView
+        android:id="@+id/textViewStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Status: Not connected..."
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+</LinearLayout>

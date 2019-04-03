@@ -13,8 +13,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -25,6 +27,10 @@ public class MainActivity extends Activity {
     UsbDeviceConnection connection;
     BlinkStick led;
     BlinkStickFinder finder;
+
+    Button buttonFrame;
+    Button buttonOff;
+    TextView textViewStatus;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,37 +43,20 @@ public class MainActivity extends Activity {
 		finder.setContext(this);
 		finder.setPermissionIntent(mPermissionIntent);
 		
-		Button btn = (Button)findViewById(R.id.button1);
+		Button btn = (Button)findViewById(R.id.buttonConnect);
 		btn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				led = finder.findFirst();
-				if (led != null)
-				{
-					l("Found BlinkStick device");
-
-					try {
-						if (finder.openDevice(led))
-						{
-						    l("Manufacturer: " + led.getManufacturer());
-						    l("Product: " + led.getProduct());
-						    l("Serial: " + led.getSerial());
-						    l("Color: " + led.getColorString());
-						    l("Mode: " + led.getMode());
-						}
-					} 
-					catch (BlinkStickUnauthorizedException e) {
-						finder.requestPermission(led);
-					}
-				}
-
-				//findDevice();
+				findAndRequestPermission(true);
+				updateUI();
 			}
 		});
 
-		btn = (Button)findViewById(R.id.button2);
-		btn.setOnClickListener(new View.OnClickListener() {
+		textViewStatus = (TextView)findViewById(R.id.textViewStatus);
+
+		buttonFrame = (Button)findViewById(R.id.buttonFrame);
+		buttonFrame.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -81,12 +70,11 @@ public class MainActivity extends Activity {
 		});
 		
 		
-		btn = (Button)findViewById(R.id.button3);
-		btn.setOnClickListener(new View.OnClickListener() {
+		buttonOff = (Button)findViewById(R.id.buttonOff);
+		buttonOff.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				//findDevice();
 				if (led != null)
 				{
 					led.turnOff();
@@ -94,12 +82,12 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		final SeekBar barR = (SeekBar)findViewById(R.id.seekBar1);
-		final SeekBar barG = (SeekBar)findViewById(R.id.seekBar2);
-		final SeekBar barB = (SeekBar)findViewById(R.id.seekBar3);
-		final SeekBar barIndex = (SeekBar)findViewById(R.id.seekBar5);
+		final SeekBar barR = (SeekBar)findViewById(R.id.seekBarColorR);
+		final SeekBar barG = (SeekBar)findViewById(R.id.seekBarColorG);
+		final SeekBar barB = (SeekBar)findViewById(R.id.seekBarColorB);
+		final SeekBar barIndex = (SeekBar)findViewById(R.id.seekBarLedIndex);
 		
-		SeekBar.OnSeekBarChangeListener onchange = new SeekBar.OnSeekBarChangeListener() {
+		SeekBar.OnSeekBarChangeListener onColorChange = new SeekBar.OnSeekBarChangeListener() {
 			
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
@@ -129,11 +117,11 @@ public class MainActivity extends Activity {
 				}
 			}
 		};
-        barR.setOnSeekBarChangeListener(onchange);
-        barG.setOnSeekBarChangeListener(onchange);
-        barB.setOnSeekBarChangeListener(onchange);
+        barR.setOnSeekBarChangeListener(onColorChange);
+        barG.setOnSeekBarChangeListener(onColorChange);
+        barB.setOnSeekBarChangeListener(onColorChange);
 
-		final SeekBar barLimit = (SeekBar)findViewById(R.id.seekBar4);
+		final SeekBar barLimit = (SeekBar)findViewById(R.id.seekBarLedBrightness);
 		barLimit.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			
 			@Override
@@ -154,6 +142,60 @@ public class MainActivity extends Activity {
 				led.setBrightnessLimit(progress);
 			}
 		});
+
+		updateUI();
+	}
+
+	private void updateUI() {
+		LinearLayout layout = (LinearLayout) findViewById(R.id.mainLinearLayout);
+		for (int i = 0; i < layout.getChildCount(); i++) {
+			View child = layout.getChildAt(i);
+			if (child.getId() != R.id.textViewStatus) {
+				child.setEnabled(led != null);
+			}
+		}
+
+		buttonOff.setEnabled(led != null);
+		buttonFrame.setEnabled(led != null);
+	}
+
+	private void findAndRequestPermission(Boolean requestPermission)
+	{
+		if (led != null) {
+			Toast.makeText(this, "Already connected to BlinkStick...", Toast.LENGTH_SHORT).show();
+			return;
+		}
+
+		led = finder.findFirst();
+		if (led == null)
+		{
+			textViewStatus.setText("Status: Could not find BlinkStick...");
+		}
+		else
+		{
+			l("Found BlinkStick device");
+
+			try {
+				if (finder.openDevice(led))
+				{
+					l("Manufacturer: " + led.getManufacturer());
+					l("Product: " + led.getProduct());
+					l("Serial: " + led.getSerial());
+					l("Color: " + led.getColorString());
+					l("Mode: " + led.getMode());
+				}
+
+				textViewStatus.setText("Status: Connected to " + led.getSerial());
+			}
+			catch (BlinkStickUnauthorizedException e) {
+				if (requestPermission) {
+					finder.requestPermission(led);
+					findAndRequestPermission(false);
+				} else {
+					textViewStatus.setText("Status: Failed to get permission");
+				}
+			}
+		}
 	}
 	
 	/*
