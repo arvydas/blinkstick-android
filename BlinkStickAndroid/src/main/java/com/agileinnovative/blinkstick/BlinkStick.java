@@ -74,7 +74,10 @@ public class BlinkStick {
 	{
 		if (_VersionMajor == -1)
 		{
-            _VersionMajor = Integer.parseInt(getSerial().substring(getSerial().length() - 3, getSerial().length() - 2));
+			String serial = getSerial();
+			if (serial != null) {
+				_VersionMajor = Integer.parseInt(serial.substring(serial.length() - 3, serial.length() - 2));
+			}
 		}
 		return _VersionMajor;
 	}
@@ -89,7 +92,10 @@ public class BlinkStick {
 	public int getVersionMinor() {
 		if (_VersionMinor == -1)
 		{
-            _VersionMinor = Integer.parseInt(getSerial().substring(getSerial().length() - 1, getSerial().length()));
+			String serial = getSerial();
+			if (serial != null) {
+				_VersionMinor = Integer.parseInt(serial.substring(serial.length() - 1, serial.length()));
+			}
 		}
 		return _VersionMinor;
 	}
