@@ -4,7 +4,12 @@ import com.agileinnovative.blinkstick.BlinkStick;
 import com.agileinnovative.blinkstick.BlinkStickFinder;
 import com.agileinnovative.blinkstick.BlinkStickUnauthorizedException;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -16,25 +21,52 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends Activity {
 
 	public final static String TAG = "USBController";  
 	private PendingIntent mPermissionIntent;
-	private static final String ACTION_USB_PERMISSION = "com.examples.accessory.controller.action.USB_PERMISSION";
+	private static final String ACTION_USB_PERMISSION = "com.examples.blinksticktest.USB_PERMISSION";
 	
-    UsbDeviceConnection connection;
     BlinkStick led;
     BlinkStickFinder finder;
 
+	Button buttonConnect;
     Button buttonFrame;
     Button buttonOff;
     TextView textViewStatus;
-    Boolean permissionAcquired = false;
-	
+
+	public class UsbReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (ACTION_USB_PERMISSION.equals(action))
+			{
+				UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+
+				if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false))
+				{
+					if (device != null)
+					{
+					    try {
+							if (openBlinkStick(led)) {
+								textViewStatus.setText("Status: Connected to " + led.getSerial());
+							}
+						} catch (Exception e) {
+							textViewStatus.setText(e.getMessage());
+						}
+					}
+				}
+				else
+				{
+					textViewStatus.setText("Status: Failed to get permission");
+					led = null;
+					updateUI();
+				}
+			}
+		}
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,6 +77,10 @@ public class MainActivity extends Activity {
 		finder = new BlinkStickFinder();
 		finder.setContext(this);
 		finder.setPermissionIntent(mPermissionIntent);
+
+		IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+		UsbReceiver usbReceiver = new UsbReceiver();
+		registerReceiver(usbReceiver, filter);
 		
 		Button btn = (Button)findViewById(R.id.buttonConnect);
 		btn.setOnClickListener(new View.OnClickListener() {
@@ -58,6 +94,8 @@ public class MainActivity extends Activity {
 
 		textViewStatus = (TextView)findViewById(R.id.textViewStatus);
 
+		buttonConnect = (Button)findViewById(R.id.buttonConnect);
+
 		buttonFrame = (Button)findViewById(R.id.buttonFrame);
 		buttonFrame.setOnClickListener(new View.OnClickListener() {
 			
@@ -66,7 +104,16 @@ public class MainActivity extends Activity {
 				//findDevice();
 				if (led != null)
 				{
-					byte[] data = new byte[] {(byte)255, 0, 0, 0, (byte)255, 0, 0, 0, (byte)255};
+					byte[] data = new byte[] {
+							(byte)255, 0, 0,
+							0, (byte)255, 0,
+							0, 0, (byte)255,
+							(byte)128, (byte)128, 0,
+							0, (byte)128, (byte)128,
+							(byte)128, 0, (byte)128,
+							(byte)128, (byte)128, (byte)128,
+							(byte)64, (byte)128, (byte)255,
+					};
 					led.setColors(data);
 				}
 			}
@@ -197,18 +244,26 @@ public class MainActivity extends Activity {
 		for (int i = 0; i < layout.getChildCount(); i++) {
 			View child = layout.getChildAt(i);
 			if (child.getId() != R.id.textViewStatus) {
-				child.setEnabled(led != null && permissionAcquired);
+				child.setEnabled(led != null);
 			}
 		}
 
-		buttonOff.setEnabled(led != null && permissionAcquired);
-		buttonFrame.setEnabled(led != null && permissionAcquired);
+		buttonOff.setEnabled(led != null);
+		buttonFrame.setEnabled(led != null);
+
+		if (led == null) {
+			buttonConnect.setText("Connect");
+		} else {
+			buttonConnect.setText("Disconnect");
+		}
 	}
 
 	private void findBlinkStick()
 	{
 		if (led != null) {
-			Toast.makeText(this, "Already connected to BlinkStick...", Toast.LENGTH_SHORT).show();
+		    led = null;
+			textViewStatus.setText("Status: Disconnected");
+		    updateUI();
 			return;
 		}
 
@@ -225,21 +280,11 @@ public class MainActivity extends Activity {
 			try {
 				if (openBlinkStick(led))
 				{
-					permissionAcquired = true;
 					textViewStatus.setText("Status: Connected to " + led.getSerial());
 				}
 			}
 			catch (BlinkStickUnauthorizedException e) {
                 finder.requestPermission(led);
-
-				try {
-					if (!openBlinkStick(led)) {
-						textViewStatus.setText("Status: Failed to get permission");
-						led = null;
-					}
-				} catch (BlinkStickUnauthorizedException e1) {
-					e1.printStackTrace();
-				}
 			}
 		}
 	}
@@ -273,3 +318,5 @@ public class MainActivity extends Activity {
 	}
 	
 }
+
+
