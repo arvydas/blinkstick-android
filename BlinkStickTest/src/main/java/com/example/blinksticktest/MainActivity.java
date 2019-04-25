@@ -169,8 +169,8 @@ public class MainActivity extends Activity {
 
 				if (index == 0)
 				{
-					byte[] data = new byte[3 * 8];
-					for (int i = 0; i < 8; i++) {
+					byte[] data = new byte[3 * 32];
+					for (int i = 0; i < data.length / 3; i++) {
 						data[i*3] = (byte)barG.getProgress();
 						data[i*3 + 1] = (byte)barR.getProgress();
 						data[i*3 + 2] = (byte)barB.getProgress();
